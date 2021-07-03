@@ -1,0 +1,2 @@
+INSERT INTO certificate (id, name, description, price, duration, create_date, last_update_date) VALUES (55, 'roman', 'hello roman', 10.0, 1, '2021-06-11T02:17', '2021-06-11T19:57:12');
+INSERT INTO certificate (id, name, description, price, duration, create_date, last_update_date) VALUES (56, 'andrew', 'hello andrew', 2.0, 5, '2021-06-11T02:17', '2021-06-11T02:17:23');
