@@ -1,6 +1,7 @@
 package com.epam.esm.web.contoller;
 
 import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.web.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

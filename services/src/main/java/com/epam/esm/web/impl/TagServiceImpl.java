@@ -1,19 +1,19 @@
 package com.epam.esm.web.impl;
 
+import com.epam.esm.converter.TagConverter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.DuplicateResourceException;
 import com.epam.esm.exception.ResourceIsUsedException;
 import com.epam.esm.exception.ResourceNotFoundException;
-import com.epam.esm.exception.ServiceException;
 import com.epam.esm.model.Tag;
-import com.epam.esm.converter.TagConverter;
 import com.epam.esm.validator.Validator;
 import com.epam.esm.web.TagRepository;
 import com.epam.esm.web.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,30 +32,15 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  @Transactional
-  public TagDto save(TagDto tagDto) {
-    if (isResourceExist(tagDto.getName())) {
-      throw new DuplicateResourceException(
-          "Resource with name = [" + tagDto.getName() + "] already exists", 40901);
+  public TagDto save(TagDto tag) {
+    tagDtoValidator.validate(tag);
+    try{
+      Tag newTag = tagRepository.create(TagConverter.convertDtoToModel(tag));
+      tag.setId(newTag.getId());
+    }catch (DataIntegrityViolationException e){
+      throw new DuplicateResourceException("tag with name = " + tag.getName() + " already exists", 40901);
     }
-    tagDtoValidator.validate(tagDto);
-    Tag tag = TagConverter.convertDtoToModel(tagDto);
-    int lastId = tagRepository.create(tag);
-    if (lastId != 0) {
-      return getById(lastId);
-    } else {
-      throw new ServiceException("Something went wrong while creating tag on server", 50001);
-    }
-  }
-
-  @Override
-  public boolean isResourceExist(String name) {
-    try {
-      getByTagName(name);
-      return true;
-    } catch (ResourceNotFoundException e) {
-      return false;
-    }
+    return tag;
   }
 
   @Override
@@ -66,40 +51,24 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  @Transactional
-  public int delete(int id) {
-    if (isResourceExist(id)) {
-      if (tagRepository.isTagConnected(id)) {
-        throw new ResourceIsUsedException(
-            "This tag is connected with existing certificates", 40301);
-      }
-      return tagRepository.delete(id);
-    } else {
-      throw new ResourceNotFoundException("Tag with id = " + id + " does not exist", 40401);
-    }
-  }
-
-  @Override
   public TagDto getById(int id) {
-    try {
-      return TagConverter.convertModelToDto(tagRepository.findOne(id));
-    } catch (EmptyResultDataAccessException e) {
-      throw new ResourceNotFoundException("Tag with id = " + id + " does not exist", 40401);
+    Tag tag = tagRepository.findOne(id);
+    if(tag == null){
+      throw new ResourceNotFoundException("tag with id = " + id + " does not exist", 40401);
     }
-  }
-
-  public TagDto getByTagName(String name) {
-    try {
-      return TagConverter.convertModelToDto(tagRepository.findByName(name));
-    } catch (EmptyResultDataAccessException e) {
-      throw new ResourceNotFoundException("Tag with name = " + name + " does not exist", 40401);
-    }
+    return TagConverter.convertModelToDto(tag);
   }
 
   @Override
-  public List<TagDto> getTagsByCertificateId(int certId) {
-    return tagRepository.findTagsByCertificateId(certId).stream()
-        .map(TagConverter::convertModelToDto)
-        .collect(Collectors.toList());
+  public int delete(int id) {
+    try{
+      tagRepository.delete(id);
+    }catch (JpaObjectRetrievalFailureException e){
+      throw new ResourceNotFoundException("tag with id = " + id + " does not exist", 40401);
+    }
+    catch (JpaSystemException ex){
+      throw new ResourceIsUsedException("tag with id = " + id + " is in use", 40901);
+    }
+    return 1;
   }
 }

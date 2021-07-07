@@ -8,5 +8,5 @@ public interface Validator<T> {
    * @param entity the entity
    * @return true if entuty is valid, false otherwise
    */
-  abstract boolean validate(T entity);
+   boolean validate(T entity);
 }

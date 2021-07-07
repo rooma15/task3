@@ -1,15 +1,28 @@
 package com.epam.esm.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Objects;
 
+@Entity
+@Table(name = "tag")
 public class Tag {
-  private final Integer id;
-  private final String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
+
+  private String name;
 
   public Tag(Integer id, String name) {
     this.id = id;
     this.name = name;
   }
+
+
+  public Tag() {}
 
   public Integer getId() {
     return id;
@@ -19,9 +32,12 @@ public class Tag {
     return name;
   }
 
-  @Override
-  public String toString() {
-    return "Tag{" + "id=" + id + ", name='" + name + '\'' + '}';
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
@@ -35,5 +51,10 @@ public class Tag {
   @Override
   public int hashCode() {
     return Objects.hash(id, name);
+  }
+
+  @Override
+  public String toString() {
+    return "Tag{" + "id=" + id + ", name='" + name + '\'' + '}';
   }
 }

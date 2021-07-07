@@ -6,12 +6,6 @@ import java.util.List;
 
 public interface CertificateService extends Service<CertificateDto> {
 
-  /**
-   * Partitial update certificate dto
-   *
-   * @param id the id
-   * @return the certificate dto
-   */
   CertificateDto partialUpdate(CertificateDto certificate, int id);
 
   /**

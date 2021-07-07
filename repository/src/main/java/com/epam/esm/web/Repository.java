@@ -7,9 +7,8 @@ public interface Repository<T> {
 
   T findOne(int id);
 
-  List<T> findByQuery(String sql, Class<T> elemType, Object... params);
 
-  int create(T Entity);
+  T create(T Entity);
 
-  int delete(int id);
+  void delete(int id);
 }

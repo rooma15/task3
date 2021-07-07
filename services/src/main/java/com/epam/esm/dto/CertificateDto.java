@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class CertificateDto {
   private Integer id;
@@ -20,7 +21,7 @@ public class CertificateDto {
   @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
   private LocalDateTime lastUpdateDate;
 
-  private List<TagDto> tags;
+  private Set<TagDto> tags;
 
   public CertificateDto(
       Integer id,
@@ -30,7 +31,7 @@ public class CertificateDto {
       Integer duration,
       LocalDateTime createDate,
       LocalDateTime lastUpdateDate,
-      List<TagDto> tags) {
+      Set<TagDto> tags) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -44,7 +45,7 @@ public class CertificateDto {
   public CertificateDto() {}
 
   public CertificateDto(
-      String name, String description, BigDecimal price, Integer duration, List<TagDto> tags) {
+      String name, String description, BigDecimal price, Integer duration, Set<TagDto> tags) {
     this.name = name;
     this.description = description;
     this.price = price;
@@ -80,7 +81,7 @@ public class CertificateDto {
     return lastUpdateDate;
   }
 
-  public List<TagDto> getTags() {
+  public Set<TagDto> getTags() {
     return tags;
   }
 
@@ -112,7 +113,7 @@ public class CertificateDto {
     this.lastUpdateDate = lastUpdateDate;
   }
 
-  public void setTags(List<TagDto> tags) {
+  public void setTags(Set<TagDto> tags) {
     this.tags = tags;
   }
 

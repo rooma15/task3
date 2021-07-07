@@ -23,8 +23,8 @@ public class AllExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
-    ResponseError generaExceptionHandler(HttpServletResponse resp, HttpServletRequest req, Exception e){
-        return new ResponseError(e.getMessage(), 500);
+    ResponseError generaExceptionHandler(Exception e){
+        return new ResponseError(e.toString(), 400);
     }
 
     @ExceptionHandler(value = ValidationException.class)

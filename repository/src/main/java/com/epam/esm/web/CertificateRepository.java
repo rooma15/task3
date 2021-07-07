@@ -2,21 +2,11 @@ package com.epam.esm.web;
 
 import com.epam.esm.model.Certificate;
 
-import java.util.List;
-import java.util.Map;
-
 public interface CertificateRepository extends Repository<Certificate> {
-  int update(String sql, Map<String, Object> parameterSource, int id);
 
-  List<Certificate> findCertificatesByTagId(int tagId);
+  void refresh(Certificate certificate);
 
-  int update(Certificate certificate);
+  void makeLink(int certificateId, int tagId);
 
-  List<String> getColumnNames();
-
-  int makeLink(int certId, int tagId);
-
-  int deleteLink(int certId, int tagId);
-
-  int deleteLink(int certId);
+  Certificate update(Certificate certificate);
 }
