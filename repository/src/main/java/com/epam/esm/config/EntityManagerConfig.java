@@ -12,7 +12,7 @@ import javax.persistence.Persistence;
 public class EntityManagerConfig {
     @Bean(name = "entityManager")
     @Primary
-    EntityManager getEntityManager(){
+     EntityManager getEntityManager(){
         String PERSISTENCE_UNIT_NAME = "my-pers";
         EntityManagerFactory emFactoryObj = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         return emFactoryObj.createEntityManager();

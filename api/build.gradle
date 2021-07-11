@@ -9,13 +9,11 @@ repositories {
 }
 
 dependencies {
-    /*implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'*/
-    /*implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'*/
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
-    /*implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.3'*/
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.5.2'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: '2.5.2', ext: 'pom'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.5.2'
     implementation project(":repository")
     implementation project(":services")
 }

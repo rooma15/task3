@@ -5,10 +5,10 @@ import com.epam.esm.model.User;
 
 import java.util.List;
 
-public interface UserRepository {
+public interface UserRepository extends Repository<User>{
   List<User> findAll();
 
   User findOne(int id);
 
-  User order(int userId, Order order);
+  Integer findMostUsedTag(String query, List<Object> params);
 }

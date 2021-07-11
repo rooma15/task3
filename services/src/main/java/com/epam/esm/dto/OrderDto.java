@@ -1,14 +1,13 @@
 package com.epam.esm.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class OrderDto {
+public class OrderDto extends RepresentationModel<OrderDto> {
   private Integer id;
 
   @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
@@ -17,9 +16,8 @@ public class OrderDto {
   private BigDecimal cost;
   private CertificateDto certificate;
 
-  private Integer certificateId;
-
-  public OrderDto(Integer id, LocalDateTime purchaseTime, BigDecimal cost, CertificateDto certificate) {
+  public OrderDto(
+      Integer id, LocalDateTime purchaseTime, BigDecimal cost, CertificateDto certificate) {
     this.id = id;
     this.purchaseTime = purchaseTime;
     this.cost = cost;
@@ -32,20 +30,7 @@ public class OrderDto {
     this.certificate = certificate;
   }
 
-  public OrderDto(Integer certificateId) {
-    this.certificateId = certificateId;
-  }
-
-  public OrderDto() {
-  }
-
-  public Integer getCertificateId() {
-    return certificateId;
-  }
-
-  public void setCertificateId(Integer certificateId) {
-    this.certificateId = certificateId;
-  }
+  public OrderDto() {}
 
   public Integer getId() {
     return id;
@@ -87,28 +72,21 @@ public class OrderDto {
     return Objects.equals(id, orderDto.id) &&
             Objects.equals(purchaseTime, orderDto.purchaseTime) &&
             Objects.equals(cost, orderDto.cost) &&
-            Objects.equals(certificate, orderDto.certificate) &&
-            Objects.equals(certificateId, orderDto.certificateId);
+            Objects.equals(certificate, orderDto.certificate);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, purchaseTime, cost, certificate, certificateId);
+    return Objects.hash(id, purchaseTime, cost, certificate);
   }
 
   @Override
   public String toString() {
-    return "OrderDto{"
-        + "id="
-        + id
-        + ", purchaseTime="
-        + purchaseTime
-        + ", cost="
-        + cost
-        + ", certificate="
-        + certificate
-        + ", certificateId="
-        + certificateId
-        + '}';
+    return "OrderDto{" +
+            "id=" + id +
+            ", purchaseTime=" + purchaseTime +
+            ", cost=" + cost +
+            ", certificate=" + certificate +
+            '}';
   }
 }

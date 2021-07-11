@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 
 /** The type Tag repository. */
@@ -29,8 +30,7 @@ public class TagRepositoryImpl implements TagRepository {
   @Override
   public List<Tag> findAll() {
     entityManager.getTransaction().begin();
-    List<Tag> tags =
-            entityManager.createQuery(FIND_ALL, Tag.class).getResultList();
+    List<Tag> tags = entityManager.createQuery(FIND_ALL, Tag.class).getResultList();
     entityManager.getTransaction().commit();
     return tags;
   }
@@ -42,7 +42,6 @@ public class TagRepositoryImpl implements TagRepository {
     entityManager.getTransaction().commit();
     return tag;
   }
-
 
   @Override
   public Tag create(Tag tag) {
@@ -60,13 +59,32 @@ public class TagRepositoryImpl implements TagRepository {
   @Override
   public void delete(int id) {
     entityManager.getTransaction().begin();
-    try{
+    try {
       entityManager.remove(entityManager.getReference(Tag.class, id));
       entityManager.getTransaction().commit();
-    }
-    catch (Exception e){
+    } catch (Exception e) {
       entityManager.getTransaction().rollback();
       throw e;
     }
+  }
+
+  @Override
+  public Object doNativeGetQuery(String query, List<Object> parameters) {
+    Query nativeQuery = entityManager.createNativeQuery(query);
+    for (int i = 0; i < parameters.size(); i++) {
+      nativeQuery.setParameter(i + 1, parameters.get(i));
+    }
+    return nativeQuery.getSingleResult();
+  }
+
+  @Override
+  public List<Tag> getPaginated(Integer from, Integer count) {
+    List<Tag> tags =
+        entityManager
+            .createQuery(FIND_ALL)
+            .setFirstResult(from)
+            .setMaxResults(count)
+            .getResultList();
+    return tags;
   }
 }

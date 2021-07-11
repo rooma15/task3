@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 
 @Repository
@@ -38,19 +39,23 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public User order(int userId, Order order) {
-    entityManager.getTransaction().begin();
-    User existedUser = entityManager.find(User.class, userId);
-    List<Order> orders = existedUser.getOrders();
-    orders.add(order);
-    try{
-      existedUser.setOrders(orders);
-      entityManager.getTransaction().commit();
-      entityManager.refresh(existedUser);
-    }catch (Exception e){
-      entityManager.getTransaction().rollback();
-      throw e;
+  public Integer findMostUsedTag(String query, List<Object> parameters) {
+    Query nativeQuery = entityManager.createNativeQuery(query);
+    for (int i = 0; i < parameters.size(); i++) {
+      nativeQuery.setParameter(i + 1, parameters.get(i));
     }
-    return existedUser;
+    List<Object[]> list =  nativeQuery.getResultList();
+    return (Integer) list.get(0)[1];
+  }
+
+  @Override
+  public List<User> getPaginated(Integer from, Integer count) {
+    List<User> users =
+            entityManager
+                    .createQuery(FIND_ALL)
+                    .setFirstResult(from)
+                    .setMaxResults(count)
+                    .getResultList();
+    return users;
   }
 }

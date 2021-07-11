@@ -1,8 +1,10 @@
 package com.epam.esm.dto;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.Objects;
 
-public class TagDto {
+public class TagDto extends RepresentationModel<TagDto> {
   private Integer id;
   private String name;
 

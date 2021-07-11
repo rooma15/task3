@@ -1,6 +1,7 @@
 package com.epam.esm.web;
 
 import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.model.Certificate;
 
 import java.util.List;
 
@@ -14,15 +15,25 @@ public interface CertificateService extends Service<CertificateDto> {
    * @param certificate the certificate with new values of the fields
    * @return {@link CertificateDto} of new certificate
    */
-  CertificateDto update(CertificateDto certificate, int id);
+  CertificateDto fullUpdate(CertificateDto certificate, int id);
+
+  List<CertificateDto> getPaginated(Integer page, Integer size);
 
   /**
-   * Gets certificates by tag name.
+   * Save entity in db
    *
-   * @param name the name
-   * @return {@link List} of certificates with certain tag
+   * @param EntityDto the entity dto
+   * @return the t
    */
-  List<CertificateDto> getByTagName(String name);
+  CertificateDto save(CertificateDto EntityDto);
+
+  /**
+   * Delete entoty from db
+   *
+   * @param id the id
+   * @return 1 if enerything was okay, 0 otherwise
+   */
+  int delete(int id);
 
   /**
    * Gets sorted certificates.
@@ -40,5 +51,7 @@ public interface CertificateService extends Service<CertificateDto> {
       String description,
       String sortByName,
       String sortByDate,
-      String sortByDateName);
+      String sortByDateName,
+      int page,
+      int size);
 }

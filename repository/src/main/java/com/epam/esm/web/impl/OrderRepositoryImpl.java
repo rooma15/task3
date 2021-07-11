@@ -3,7 +3,6 @@ package com.epam.esm.web.impl;
 import com.epam.esm.model.Order;
 import com.epam.esm.model.User;
 import com.epam.esm.web.OrderRepository;
-import org.hibernate.internal.build.AllowPrintStacktrace;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -16,7 +15,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private final String FIND_ALL = "SELECT a FROM Order a";
 
-    @AllowPrintStacktrace
     public OrderRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
@@ -43,6 +41,34 @@ public class OrderRepositoryImpl implements OrderRepository {
         try{
             entityManager.persist(order);
             entityManager.getTransaction().commit();
+        }catch (Exception e){
+            entityManager.getTransaction().rollback();
+            throw e;
+        }
+        return order;
+    }
+
+    @Override
+    public List<Order> getPaginated(Integer from, Integer count) {
+        List<Order> orders =
+                entityManager
+                        .createQuery(FIND_ALL)
+                        .setFirstResult(from)
+                        .setMaxResults(count)
+                        .getResultList();
+        return orders;
+    }
+
+    @Override
+    public Order order(Integer userId, Order order) {
+        entityManager.getTransaction().begin();
+        User existedUser = entityManager.find(User.class, userId);
+        List<Order> orders = existedUser.getOrders();
+        orders.add(order);
+        try{
+            existedUser.setOrders(orders);
+            entityManager.getTransaction().commit();
+            entityManager.refresh(existedUser);
         }catch (Exception e){
             entityManager.getTransaction().rollback();
             throw e;

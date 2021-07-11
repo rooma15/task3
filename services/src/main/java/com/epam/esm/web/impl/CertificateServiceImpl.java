@@ -3,6 +3,7 @@ package com.epam.esm.web.impl;
 import com.epam.esm.converter.CertificateConverter;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.exception.PaginationException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.filter.CertificateNameFilter;
 import com.epam.esm.filter.DescriptionCertificateFilter;
@@ -12,13 +13,13 @@ import com.epam.esm.filter.SortByDateNameFilter;
 import com.epam.esm.filter.SortByNameFilter;
 import com.epam.esm.filter.TagNameFilter;
 import com.epam.esm.model.Certificate;
+import com.epam.esm.validator.PageValidator;
 import com.epam.esm.validator.PartialValidator;
 import com.epam.esm.validator.Validator;
 import com.epam.esm.web.CertificateRepository;
 import com.epam.esm.web.CertificateService;
 import com.epam.esm.web.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,8 @@ public class CertificateServiceImpl implements CertificateService {
   private final TagService tagService;
   private final Validator<CertificateDto> validator;
   private final PartialValidator partialValidator;
-
+  private final PageValidator pageValidator;
+  /*private final PageService<Certificate, CertificateDto> pageService;*/
   /**
    * Instantiates a new Certificate service.
    *
@@ -49,11 +51,15 @@ public class CertificateServiceImpl implements CertificateService {
       CertificateRepository certificateRepository,
       TagService tagService,
       Validator<CertificateDto> validator,
-      PartialValidator partialValidator) {
+      PartialValidator partialValidator,
+      PageValidator pageValidator
+      /*PageService<Certificate, CertificateDto> pageService*/) {
     this.tagService = tagService;
     this.certificateRepository = certificateRepository;
     this.validator = validator;
     this.partialValidator = partialValidator;
+    this.pageValidator = pageValidator;
+    /*this.pageService = pageService;*/
   }
 
   private final UnaryOperator<Certificate> saveOperator =
@@ -79,8 +85,10 @@ public class CertificateServiceImpl implements CertificateService {
       String description,
       String sortByDate,
       String sortByName,
-      String sortByDateName) {
-    FilterManager filterManager = new FilterManager(getAll());
+      String sortByDateName,
+      int page,
+      int size) {
+    FilterManager filterManager = new FilterManager();
 
     if (tagName != null) {
       filterManager.add(new TagNameFilter(tagName));
@@ -101,41 +109,38 @@ public class CertificateServiceImpl implements CertificateService {
     if (sortByDateName != null) {
       filterManager.add(new SortByDateNameFilter(sortByDateName));
     }
-    filterManager.start();
-    return filterManager.getCertificates();
+
+    if (filterManager.getSize() != 0) {
+      filterManager.setCertificates(getAll());
+      filterManager.start();
+      return filterManager.getCertificates();
+    }
+    return getPaginated(page, size);
+    /*return pageService.getPaginated(page, size);*/
   }
 
-  @Override
-  public CertificateDto update(CertificateDto certificate, int id) {
-    validator.validate(certificate);
+  private CertificateDto update(CertificateDto certificate, int id) {
     certificate.setId(id);
     certificate.setLastUpdateDate(LocalDateTime.now());
     Certificate updatedCertificate;
-    try {
-      updatedCertificate = saveOrUpdate(certificate, updateOperator);
-    } catch (JpaObjectRetrievalFailureException e) {
+    if (!isResourceExist(id)) {
       throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+    } else {
+      updatedCertificate = saveOrUpdate(certificate, updateOperator);
     }
     return CertificateConverter.convertModelToDto(updatedCertificate);
+  }
+
+  @Override
+  public CertificateDto fullUpdate(CertificateDto certificate, int id) {
+    validator.validate(certificate);
+    return update(certificate, id);
   }
 
   @Override
   public CertificateDto partialUpdate(CertificateDto certificate, int id) {
     partialValidator.validate(certificate);
-    certificate.setId(id);
-    certificate.setLastUpdateDate(LocalDateTime.now());
-    Certificate updatedCertificate;
-    try {
-      updatedCertificate = saveOrUpdate(certificate, updateOperator);
-    } catch (JpaObjectRetrievalFailureException e) {
-      throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
-    }
-    return CertificateConverter.convertModelToDto(updatedCertificate);
-  }
-
-  @Override
-  public List<CertificateDto> getByTagName(String name) {
-    return null;
+    return update(certificate, id);
   }
 
   private boolean checkTagExistence(Collection<TagDto> tags, TagDto tag) {
@@ -151,16 +156,16 @@ public class CertificateServiceImpl implements CertificateService {
       CertificateDto certificate, UnaryOperator<Certificate> operator) {
     List<TagDto> allTags = tagService.getAll();
     Set<TagDto> existedTags = new HashSet<>();
-    if(certificate.getTags() != null){
+    if (certificate.getTags() != null) {
       Set<TagDto> newTags =
-              certificate.getTags().stream()
-                      .filter(tag -> !checkTagExistence(allTags, tag))
-                      .collect(Collectors.toSet());
+          certificate.getTags().stream()
+              .filter(tag -> !checkTagExistence(allTags, tag))
+              .collect(Collectors.toSet());
 
       existedTags =
-              allTags.stream()
-                      .filter(tag -> checkTagExistence(certificate.getTags(), tag))
-                      .collect(Collectors.toSet());
+          allTags.stream()
+              .filter(tag -> checkTagExistence(certificate.getTags(), tag))
+              .collect(Collectors.toSet());
 
       certificate.setTags(newTags);
     }
@@ -170,7 +175,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     certificate.setId(newCertificate.getId());
 
-    if(certificate.getTags() != null){
+    if (certificate.getTags() != null) {
       for (TagDto existedTag : existedTags) {
         certificateRepository.makeLink(certificate.getId(), existedTag.getId());
       }
@@ -206,11 +211,25 @@ public class CertificateServiceImpl implements CertificateService {
 
   @Override
   public int delete(int id) {
-    try {
-      certificateRepository.delete(id);
-    } catch (JpaObjectRetrievalFailureException e) {
+    if (!isResourceExist(id)) {
       throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+    } else {
+      certificateRepository.delete(id);
     }
     return 1;
+  }
+
+  @Override
+  public List<CertificateDto> getPaginated(Integer page, Integer size) {
+    pageValidator.validate(page, size);
+    int from = (page - 1) * size;
+    List<CertificateDto> certificates =
+        certificateRepository.getPaginated(from, size).stream()
+            .map(CertificateConverter::convertModelToDto)
+            .collect(Collectors.toList());
+    if (certificates.isEmpty()) {
+      throw new PaginationException("this page does not exist", 404);
+    }
+    return certificates;
   }
 }

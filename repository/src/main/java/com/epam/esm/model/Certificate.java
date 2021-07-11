@@ -1,5 +1,9 @@
 package com.epam.esm.model;
 
+import com.epam.esm.audit.auditor.AuditHelper;
+import com.epam.esm.audit.model.CertificateAudit;
+import org.springframework.hateoas.RepresentationModel;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +13,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -42,8 +53,28 @@ public class Certificate {
 
   }
 
-  public Set<Tag> getTags() {
-    return tags;
+  @PostPersist
+  public void onPostPersist(){
+    audit("INSERT");
+  }
+
+  @PostUpdate
+  public void onPostUpdate(){
+    audit("UPDATE");
+  }
+
+  @PostRemove
+  public void onPostRemove(){
+    audit("REMOVE");
+  }
+
+  private void audit(String operationType){
+    AuditHelper auditHelper = new AuditHelper();
+    CertificateAudit certificateAudit = new CertificateAudit();
+    certificateAudit.setCertificateId(id);
+    certificateAudit.setOperationTime(LocalDateTime.now());
+    certificateAudit.setOperationType(operationType);
+    auditHelper.save(certificateAudit);
   }
 
   public Certificate(
@@ -63,6 +94,11 @@ public class Certificate {
     this.createDate = createDate;
     this.lastUpdateDate = lastUpdateDate;
     this.tags = tags;
+  }
+
+
+  public Set<Tag> getTags() {
+    return tags;
   }
 
   public Integer getId() {

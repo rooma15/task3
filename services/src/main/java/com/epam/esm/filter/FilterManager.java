@@ -20,6 +20,12 @@ public class FilterManager {
     this.certificates = certificates;
   }
 
+  public FilterManager() {}
+
+  public void setCertificates(List<CertificateDto> certificates) {
+    this.certificates = certificates;
+  }
+
   /**
    * Add filter to queue of filters
    *
@@ -40,6 +46,9 @@ public class FilterManager {
    * FilterManager#add(Filter)}
    */
   public void start() {
+    if(certificates == null){
+      throw new IllegalArgumentException("certificates is null, nothing to filter");
+    }
     if (head != null) {
       certificates = head.filter(certificates);
     }
@@ -52,5 +61,9 @@ public class FilterManager {
    */
   public List<CertificateDto> getCertificates() {
     return certificates;
+  }
+
+  public int getSize(){
+    return this.size;
   }
 }

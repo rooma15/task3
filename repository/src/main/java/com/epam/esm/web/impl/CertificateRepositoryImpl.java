@@ -28,7 +28,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
   public Certificate update(Certificate certificate) {
     entityManager.getTransaction().begin();
     Certificate existedCertificate = entityManager.find(Certificate.class, certificate.getId());
-    if(existedCertificate == null){
+    if (existedCertificate == null) {
       entityManager.getTransaction().rollback();
       throw new EntityNotFoundException();
     }
@@ -100,12 +100,23 @@ public class CertificateRepositoryImpl implements CertificateRepository {
   @Override
   public void delete(int id) {
     entityManager.getTransaction().begin();
-    try{
+    try {
       entityManager.remove(entityManager.getReference(Certificate.class, id));
       entityManager.getTransaction().commit();
-    }catch (Exception e){
+    } catch (Exception e) {
       entityManager.getTransaction().rollback();
       throw e;
     }
+  }
+
+  @Override
+  public List<Certificate> getPaginated(Integer from, Integer count) {
+    List<Certificate> certificates =
+        entityManager
+            .createQuery(FIND_ALL)
+            .setFirstResult(from)
+            .setMaxResults(count)
+            .getResultList();
+    return certificates;
   }
 }

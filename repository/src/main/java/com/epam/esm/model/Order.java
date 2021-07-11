@@ -1,5 +1,9 @@
 package com.epam.esm.model;
 
+import com.epam.esm.audit.auditor.AuditHelper;
+import com.epam.esm.audit.model.CertificateAudit;
+import com.epam.esm.audit.model.OrderAudit;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,6 +11,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,6 +36,31 @@ public class Order {
   @OneToOne
   @JoinColumn(name = "certificate_id")
   private Certificate certificate;
+
+
+  @PostPersist
+  public void onPostPersist(){
+    audit("INSERT");
+  }
+
+  @PostUpdate
+  public void onPostUpdate(){
+    audit("UPDATE");
+  }
+
+  @PostRemove
+  public void onPostRemove(){
+    audit("REMOVE");
+  }
+
+  private void audit(String operationType){
+    AuditHelper auditHelper = new AuditHelper();
+    OrderAudit orderAudit = new OrderAudit();
+    orderAudit.setOrderId(id);
+    orderAudit.setOperationTime(LocalDateTime.now());
+    orderAudit.setOperationType(operationType);
+    auditHelper.save(orderAudit);
+  }
 
   public Order(Integer id, LocalDateTime purchaseTime, BigDecimal cost, Certificate certificate) {
     this.id = id;

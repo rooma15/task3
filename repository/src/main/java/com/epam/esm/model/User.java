@@ -1,5 +1,9 @@
 package com.epam.esm.model;
 
+import com.epam.esm.audit.auditor.AuditHelper;
+import com.epam.esm.audit.model.TagAudit;
+import com.epam.esm.audit.model.UserAudit;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,14 +12,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "user")
-public class User{
+public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -36,6 +44,31 @@ public class User{
     this.lastName = lastName;
     this.orders = orders;
   }
+
+  @PostPersist
+  public void onPostPersist(){
+    audit("INSERT");
+  }
+
+  @PostUpdate
+  public void onPostUpdate(){
+    audit("UPDATE");
+  }
+
+  @PostRemove
+  public void onPostRemove(){
+    audit("REMOVE");
+  }
+
+  private void audit(String operationType){
+    AuditHelper auditHelper = new AuditHelper();
+    UserAudit user = new UserAudit();
+    user.setUserId(id);
+    user.setOperationTime(LocalDateTime.now());
+    user.setOperationType(operationType);
+    auditHelper.save(user);
+  }
+
 
   public User() {}
 
