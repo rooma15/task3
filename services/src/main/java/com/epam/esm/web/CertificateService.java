@@ -1,7 +1,6 @@
 package com.epam.esm.web;
 
 import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.model.Certificate;
 
 import java.util.List;
 

@@ -1,8 +1,6 @@
 package com.epam.esm.web.impl;
 
-import com.epam.esm.converter.CertificateConverter;
 import com.epam.esm.converter.TagConverter;
-import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.DuplicateResourceException;
 import com.epam.esm.exception.PaginationException;

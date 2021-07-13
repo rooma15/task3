@@ -25,8 +25,7 @@ public class PartialCertificateValidator implements PartialValidator {
     this.tagValidator = tagValidator;
   }
 
-  public boolean validate(
-      CertificateDto certificate) {
+  public boolean validate(CertificateDto certificate) {
     if (certificate.getName() != null) {
       if (certificate.getName().length() < MIN_NAME_LENGTH) {
         throw new ValidationException("Name length must be more than 3 symbols", 40302);

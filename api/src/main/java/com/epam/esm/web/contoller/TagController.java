@@ -2,7 +2,7 @@ package com.epam.esm.web.contoller;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.web.TagService;
-import com.epam.esm.web.hateoas.HAT;
+import com.epam.esm.web.hateoas.HATHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -14,26 +14,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/tags")
 public class TagController {
 
   private final TagService tagService;
-  private final HAT hat;
+  private final HATHelper hatHelper;
   /**
    * Instantiates a new Tag controller.
    *
    * @param tagService the tag service
    */
   @Autowired
-  public TagController(TagService tagService, HAT hat) {
+  public TagController(TagService tagService, HATHelper hatHelper) {
     this.tagService = tagService;
-    this.hat = hat;
+    this.hatHelper = hatHelper;
   }
 
   /**
@@ -46,13 +44,7 @@ public class TagController {
       @RequestParam(required = false, defaultValue = "1") int page,
       @RequestParam(required = false, defaultValue = "5") int size) {
     List<TagDto> tags = tagService.getPaginated(page, size);
-    /*Link selfLink = linkTo(TagController.class).withSelfRel();
-    for (TagDto tag : tags) {
-      Link tagLink = linkTo(methodOn(TagController.class).getTag(tag.getId())).withSelfRel();
-      tag.add(tagLink);
-    }
-    return CollectionModel.of(tags, selfLink);*/
-    return hat.makeTagLinks(new HashSet<>(tags), false);
+    return hatHelper.makeTagLinks(new HashSet<>(tags));
   }
 
   /**
@@ -64,10 +56,7 @@ public class TagController {
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
   public TagDto getTag(@PathVariable int id) {
     TagDto tag = tagService.getById(id);
-    /*Link selfLink = linkTo(methodOn(TagController.class).getTag(id)).withSelfRel();
-    tag.add(selfLink);
-    return tag;*/
-    return new ArrayList<>(hat.makeTagLinks(Set.of(tag), true).getContent()).get(0);
+    return hatHelper.makeTagLinks(tag);
   }
 
   /**
@@ -82,10 +71,7 @@ public class TagController {
       consumes = "application/json")
   public TagDto createTag(@RequestBody TagDto tag) {
     TagDto newTag = tagService.save(tag);
-    /*Link selfLink = linkTo(methodOn(TagController.class).createTag(tag)).withSelfRel();
-    newTag.add(selfLink);
-    return newTag;*/
-    return new ArrayList<>(hat.makeTagLinks(Set.of(newTag), true).getContent()).get(0);
+    return hatHelper.makeTagLinks(newTag);
   }
 
   /**

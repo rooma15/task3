@@ -1,12 +1,10 @@
 package com.epam.esm.web.contoller;
 
 import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.model.Certificate;
 import com.epam.esm.web.CertificateService;
-import com.epam.esm.web.hateoas.HAT;
+import com.epam.esm.web.hateoas.HATHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
@@ -32,16 +26,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 public class CertificateController {
 
   private final CertificateService certificateService;
-  private final HAT hat;
+  private final HATHelper hatHelper;
   /**
    * Instantiates a new Certificate controller.
    *
    * @param certificateService the certificate service
    */
   @Autowired
-  public CertificateController(CertificateService certificateService, HAT hat) {
+  public CertificateController(CertificateService certificateService, HATHelper hatHelper) {
     this.certificateService = certificateService;
-    this.hat = hat;
+    this.hatHelper = hatHelper;
   }
 
   /**
@@ -68,16 +62,7 @@ public class CertificateController {
     List<CertificateDto> certificates =
         certificateService.getSortedCertificates(
             tagName, name, description, sortByDate, sortByName, sortByDateName, page, size);
-    /*Link selfLink = linkTo(CertificateController.class).withSelfRel();
-    for (CertificateDto certificate : certificates) {
-      Link link =
-          linkTo(methodOn(CertificateController.class).getCertificate(certificate.getId()))
-              .withSelfRel();
-      certificate.add(link);
-    }
-    return CollectionModel.of(certificates, selfLink);*/
-    HAT hat = new HAT();
-    return hat.makeCertificateLinks(certificates, false);
+    return hatHelper.makeCertificateLinks(certificates);
   }
 
   /**
@@ -90,14 +75,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto getCertificate(@PathVariable int id) {
     CertificateDto certificate = certificateService.getById(id);
-    /*Link link =
-        linkTo(methodOn(CertificateController.class).getCertificate(id))
-            .withSelfRel();
-    certificate.add(link);
-    return certificate;*/
-    return new ArrayList<>(
-            hat.makeCertificateLinks(Arrays.asList(certificate), true).getContent())
-        .get(0);
+    return hatHelper.makeCertificateLinks(certificate);
   }
 
   /**
@@ -115,9 +93,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto update(@PathVariable int id, @RequestBody CertificateDto certificate) {
     CertificateDto updatedCertificate = certificateService.fullUpdate(certificate, id);
-    return new ArrayList<>(
-            hat.makeCertificateLinks(Arrays.asList(updatedCertificate), true).getContent())
-            .get(0);
+    return hatHelper.makeCertificateLinks(updatedCertificate);
   }
 
   /**
@@ -135,9 +111,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto updatePart(@PathVariable int id, @RequestBody CertificateDto certificate) {
     CertificateDto updatedCertificate = certificateService.partialUpdate(certificate, id);
-    return new ArrayList<>(
-            hat.makeCertificateLinks(Arrays.asList(updatedCertificate), true).getContent())
-            .get(0);
+    return hatHelper.makeCertificateLinks(updatedCertificate);
   }
 
   /**
@@ -150,12 +124,7 @@ public class CertificateController {
   @RequestMapping(method = POST, consumes = "application/json", produces = "application/json")
   public CertificateDto create(@RequestBody CertificateDto certificate) {
     CertificateDto newCertificate = certificateService.save(certificate);
-    /*Link link = linkTo(methodOn(CertificateController.class).create(certificate)).withSelfRel();
-    newCertificate.add(link);
-    return newCertificate;*/
-    return new ArrayList<>(
-            hat.makeCertificateLinks(Arrays.asList(newCertificate), true).getContent())
-            .get(0);
+    return hatHelper.makeCertificateLinks(newCertificate);
   }
 
   /**

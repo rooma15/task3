@@ -1,7 +1,6 @@
 package com.epam.esm.web.impl;
 
 import com.epam.esm.converter.OrderConverter;
-import com.epam.esm.converter.UserConverter;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.UserDto;

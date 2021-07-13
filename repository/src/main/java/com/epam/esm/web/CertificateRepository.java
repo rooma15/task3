@@ -2,7 +2,7 @@ package com.epam.esm.web;
 
 import com.epam.esm.model.Certificate;
 
-public interface CertificateRepository extends Repository<Certificate>{
+public interface CertificateRepository extends Repository<Certificate> {
 
   void refresh(Certificate certificate);
 
@@ -13,5 +13,4 @@ public interface CertificateRepository extends Repository<Certificate>{
   Certificate create(Certificate Entity);
 
   void delete(int id);
-
 }

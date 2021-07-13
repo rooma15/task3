@@ -7,18 +7,18 @@ import java.util.stream.Collectors;
 
 public class DescriptionCertificateFilter extends Filter {
 
-    public DescriptionCertificateFilter(String param) {
-        super(param);
-    }
+  public DescriptionCertificateFilter(String param) {
+    super(param);
+  }
 
-    @Override
-    List<CertificateDto> filter(List<CertificateDto> soughtList) {
-        soughtList = soughtList
-                .stream()
-                .filter(certificate -> certificate.getDescription().contains(param))
-                .collect(Collectors.toList());
-        return next == null
-                ? soughtList
-                : next.filter(soughtList);
-    }
+  @Override
+  List<CertificateDto> filter(List<CertificateDto> soughtList) {
+    soughtList =
+        soughtList.stream()
+            .filter(certificate -> certificate.getDescription().contains(param))
+            .collect(Collectors.toList());
+    return next == null
+            ? soughtList
+            : next.filter(soughtList);
+  }
 }

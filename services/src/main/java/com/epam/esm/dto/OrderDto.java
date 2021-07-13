@@ -66,13 +66,13 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
   @Override
   public boolean equals(Object o) {
-    if(this == o) return true;
-    if(o == null || getClass() != o.getClass()) return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     OrderDto orderDto = (OrderDto) o;
-    return Objects.equals(id, orderDto.id) &&
-            Objects.equals(purchaseTime, orderDto.purchaseTime) &&
-            Objects.equals(cost, orderDto.cost) &&
-            Objects.equals(certificate, orderDto.certificate);
+    return Objects.equals(id, orderDto.id)
+        && Objects.equals(purchaseTime, orderDto.purchaseTime)
+        && Objects.equals(cost, orderDto.cost)
+        && Objects.equals(certificate, orderDto.certificate);
   }
 
   @Override
@@ -82,11 +82,15 @@ public class OrderDto extends RepresentationModel<OrderDto> {
 
   @Override
   public String toString() {
-    return "OrderDto{" +
-            "id=" + id +
-            ", purchaseTime=" + purchaseTime +
-            ", cost=" + cost +
-            ", certificate=" + certificate +
-            '}';
+    return "OrderDto{"
+        + "id="
+        + id
+        + ", purchaseTime="
+        + purchaseTime
+        + ", cost="
+        + cost
+        + ", certificate="
+        + certificate
+        + '}';
   }
 }

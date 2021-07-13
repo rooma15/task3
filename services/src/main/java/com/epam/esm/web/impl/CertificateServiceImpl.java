@@ -38,7 +38,6 @@ public class CertificateServiceImpl implements CertificateService {
   private final Validator<CertificateDto> validator;
   private final PartialValidator partialValidator;
   private final PageValidator pageValidator;
-  /*private final PageService<Certificate, CertificateDto> pageService;*/
   /**
    * Instantiates a new Certificate service.
    *
@@ -52,14 +51,12 @@ public class CertificateServiceImpl implements CertificateService {
       TagService tagService,
       Validator<CertificateDto> validator,
       PartialValidator partialValidator,
-      PageValidator pageValidator
-      /*PageService<Certificate, CertificateDto> pageService*/) {
+      PageValidator pageValidator) {
     this.tagService = tagService;
     this.certificateRepository = certificateRepository;
     this.validator = validator;
     this.partialValidator = partialValidator;
     this.pageValidator = pageValidator;
-    /*this.pageService = pageService;*/
   }
 
   private final UnaryOperator<Certificate> saveOperator =
@@ -116,7 +113,6 @@ public class CertificateServiceImpl implements CertificateService {
       return filterManager.getCertificates();
     }
     return getPaginated(page, size);
-    /*return pageService.getPaginated(page, size);*/
   }
 
   private CertificateDto update(CertificateDto certificate, int id) {

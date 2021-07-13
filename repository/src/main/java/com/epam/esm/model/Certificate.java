@@ -2,7 +2,6 @@ package com.epam.esm.model;
 
 import com.epam.esm.audit.auditor.AuditHelper;
 import com.epam.esm.audit.model.CertificateAudit;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,12 +15,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -33,12 +28,15 @@ public class Certificate {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
+
   private String name;
   private String description;
   private BigDecimal price;
   private Integer duration;
+
   @Column(name = "create_date")
   private LocalDateTime createDate;
+
   @Column(name = "last_update_date")
   private LocalDateTime lastUpdateDate;
 
@@ -49,26 +47,24 @@ public class Certificate {
       inverseJoinColumns = {@JoinColumn(name = "tag_id")})
   private Set<Tag> tags = new HashSet<>();
 
-  public Certificate() {
-
-  }
+  public Certificate() {}
 
   @PostPersist
-  public void onPostPersist(){
+  public void onPostPersist() {
     audit("INSERT");
   }
 
   @PostUpdate
-  public void onPostUpdate(){
+  public void onPostUpdate() {
     audit("UPDATE");
   }
 
   @PostRemove
-  public void onPostRemove(){
+  public void onPostRemove() {
     audit("REMOVE");
   }
 
-  private void audit(String operationType){
+  private void audit(String operationType) {
     AuditHelper auditHelper = new AuditHelper();
     CertificateAudit certificateAudit = new CertificateAudit();
     certificateAudit.setCertificateId(id);
@@ -95,7 +91,6 @@ public class Certificate {
     this.lastUpdateDate = lastUpdateDate;
     this.tags = tags;
   }
-
 
   public Set<Tag> getTags() {
     return tags;

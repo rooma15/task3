@@ -14,8 +14,7 @@ public class SortByDateNameFilter extends Filter {
         LocalDateTime date2 = cert2.getCreateDate();
         int compareResult = date1.compareTo(date2);
         if (compareResult == 0) {
-            int compareNameResult = cert1.getName()
-                    .compareTo(cert2.getName());
+          int compareNameResult = cert1.getName().compareTo(cert2.getName());
           return param.equalsIgnoreCase("desc")
                   ? -compareNameResult
                   : compareNameResult;

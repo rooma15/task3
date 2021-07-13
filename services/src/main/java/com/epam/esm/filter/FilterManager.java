@@ -46,7 +46,7 @@ public class FilterManager {
    * FilterManager#add(Filter)}
    */
   public void start() {
-    if(certificates == null){
+    if (certificates == null) {
       throw new IllegalArgumentException("certificates is null, nothing to filter");
     }
     if (head != null) {
@@ -63,7 +63,7 @@ public class FilterManager {
     return certificates;
   }
 
-  public int getSize(){
+  public int getSize() {
     return this.size;
   }
 }

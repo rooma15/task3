@@ -16,7 +16,7 @@ public class TagValidator implements Validator<TagDto> {
 
   @Override
   public boolean validate(TagDto tag) {
-    if(Pattern.matches(SPACE_REGEX, tag.getName())){
+    if (Pattern.matches(SPACE_REGEX, tag.getName())) {
       throw new ValidationException("Tag must be one word", 40301);
     }
     if (tag.getName().length() <= MIN_NAME_LENGTH) {

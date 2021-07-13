@@ -1,7 +1,6 @@
 package com.epam.esm.model;
 
 import com.epam.esm.audit.auditor.AuditHelper;
-import com.epam.esm.audit.model.TagAudit;
 import com.epam.esm.audit.model.UserAudit;
 
 import javax.persistence.CascadeType;
@@ -46,21 +45,21 @@ public class User {
   }
 
   @PostPersist
-  public void onPostPersist(){
+  public void onPostPersist() {
     audit("INSERT");
   }
 
   @PostUpdate
-  public void onPostUpdate(){
+  public void onPostUpdate() {
     audit("UPDATE");
   }
 
   @PostRemove
-  public void onPostRemove(){
+  public void onPostRemove() {
     audit("REMOVE");
   }
 
-  private void audit(String operationType){
+  private void audit(String operationType) {
     AuditHelper auditHelper = new AuditHelper();
     UserAudit user = new UserAudit();
     user.setUserId(id);
@@ -68,7 +67,6 @@ public class User {
     user.setOperationType(operationType);
     auditHelper.save(user);
   }
-
 
   public User() {}
 
@@ -106,13 +104,13 @@ public class User {
 
   @Override
   public boolean equals(Object o) {
-    if(this == o) return true;
-    if(o == null || getClass() != o.getClass()) return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     User user = (User) o;
-    return Objects.equals(id, user.id) &&
-            Objects.equals(firstName, user.firstName) &&
-            Objects.equals(lastName, user.lastName) &&
-            Objects.equals(orders, user.orders);
+    return Objects.equals(id, user.id)
+        && Objects.equals(firstName, user.firstName)
+        && Objects.equals(lastName, user.lastName)
+        && Objects.equals(orders, user.orders);
   }
 
   @Override

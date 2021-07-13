@@ -1,13 +1,11 @@
 package com.epam.esm.web;
 
-import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 
 import java.util.List;
 
-public interface UserService extends Service<UserDto>{
+public interface UserService extends Service<UserDto> {
   List<UserDto> getAll();
 
   UserDto getById(int id);
@@ -15,5 +13,4 @@ public interface UserService extends Service<UserDto>{
   TagDto getMostWidelyUsedTagOfRichestUser();
 
   List<UserDto> getPaginated(Integer page, Integer size);
-
 }

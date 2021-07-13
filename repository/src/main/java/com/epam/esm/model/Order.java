@@ -1,7 +1,6 @@
 package com.epam.esm.model;
 
 import com.epam.esm.audit.auditor.AuditHelper;
-import com.epam.esm.audit.model.CertificateAudit;
 import com.epam.esm.audit.model.OrderAudit;
 
 import javax.persistence.Column;
@@ -14,9 +13,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,27 +29,27 @@ public class Order {
   private LocalDateTime purchaseTime;
 
   private BigDecimal cost;
+
   @OneToOne
   @JoinColumn(name = "certificate_id")
   private Certificate certificate;
 
-
   @PostPersist
-  public void onPostPersist(){
+  public void onPostPersist() {
     audit("INSERT");
   }
 
   @PostUpdate
-  public void onPostUpdate(){
+  public void onPostUpdate() {
     audit("UPDATE");
   }
 
   @PostRemove
-  public void onPostRemove(){
+  public void onPostRemove() {
     audit("REMOVE");
   }
 
-  private void audit(String operationType){
+  private void audit(String operationType) {
     AuditHelper auditHelper = new AuditHelper();
     OrderAudit orderAudit = new OrderAudit();
     orderAudit.setOrderId(id);
@@ -69,8 +65,7 @@ public class Order {
     this.certificate = certificate;
   }
 
-  public Order() {
-  }
+  public Order() {}
 
   public Integer getId() {
     return id;
@@ -106,13 +101,13 @@ public class Order {
 
   @Override
   public boolean equals(Object o) {
-    if(this == o) return true;
-    if(o == null || getClass() != o.getClass()) return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     Order order = (Order) o;
-    return Objects.equals(id, order.id) &&
-            Objects.equals(purchaseTime, order.purchaseTime) &&
-            Objects.equals(cost, order.cost) &&
-            Objects.equals(certificate, order.certificate);
+    return Objects.equals(id, order.id)
+        && Objects.equals(purchaseTime, order.purchaseTime)
+        && Objects.equals(cost, order.cost)
+        && Objects.equals(certificate, order.certificate);
   }
 
   @Override
@@ -122,11 +117,15 @@ public class Order {
 
   @Override
   public String toString() {
-    return "Order{" +
-            "id=" + id +
-            ", purchaseTime=" + purchaseTime +
-            ", cost=" + cost +
-            ", certificate=" + certificate +
-            '}';
+    return "Order{"
+        + "id="
+        + id
+        + ", purchaseTime="
+        + purchaseTime
+        + ", cost="
+        + cost
+        + ", certificate="
+        + certificate
+        + '}';
   }
 }

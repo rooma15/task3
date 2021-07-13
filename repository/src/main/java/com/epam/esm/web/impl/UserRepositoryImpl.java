@@ -1,6 +1,5 @@
 package com.epam.esm.web.impl;
 
-import com.epam.esm.model.Order;
 import com.epam.esm.model.User;
 import com.epam.esm.web.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,18 +43,18 @@ public class UserRepositoryImpl implements UserRepository {
     for (int i = 0; i < parameters.size(); i++) {
       nativeQuery.setParameter(i + 1, parameters.get(i));
     }
-    List<Object[]> list =  nativeQuery.getResultList();
+    List<Object[]> list = nativeQuery.getResultList();
     return (Integer) list.get(0)[1];
   }
 
   @Override
   public List<User> getPaginated(Integer from, Integer count) {
     List<User> users =
-            entityManager
-                    .createQuery(FIND_ALL)
-                    .setFirstResult(from)
-                    .setMaxResults(count)
-                    .getResultList();
+        entityManager
+            .createQuery(FIND_ALL)
+            .setFirstResult(from)
+            .setMaxResults(count)
+            .getResultList();
     return users;
   }
 }

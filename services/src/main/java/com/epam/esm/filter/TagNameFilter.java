@@ -3,7 +3,6 @@ package com.epam.esm.filter;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.TagDto;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +25,8 @@ public class TagNameFilter extends Filter {
                         .collect(Collectors.toList())
                         .containsAll(paramsList))
             .collect(Collectors.toList());
-    return next == null ? soughtList : next.filter(soughtList);
+    return next == null
+            ? soughtList
+            : next.filter(soughtList);
   }
 }
