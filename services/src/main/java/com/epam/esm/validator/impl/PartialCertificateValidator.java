@@ -34,6 +34,7 @@ public class PartialCertificateValidator implements PartialValidator {
         throw new ValidationException("Name length must be  below 20 symbols", 40302);
       }
     }
+
     if (certificate.getDescription() != null) {
       if (certificate.getDescription().length() < MIN_DESCRIPTION_LENGTH) {
         throw new ValidationException("description length must be more than 10 symbols", 40302);
@@ -42,6 +43,7 @@ public class PartialCertificateValidator implements PartialValidator {
         throw new ValidationException("description length must be below 120 symbols", 40302);
       }
     }
+
     if (certificate.getPrice() != null) {
       if (certificate.getPrice().doubleValue() < 0) {
         throw new ValidationException("price must be more than 0 or equals 0", 40302);

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SortByDateNameFilter extends Filter {
+    private final String dateParam;
+    private final String nameParam;
   private final Comparator<CertificateDto> comparator =
       (cert1, cert2) -> {
         LocalDateTime date1 = cert1.getCreateDate();
@@ -25,8 +27,10 @@ public class SortByDateNameFilter extends Filter {
         }
       };
 
-  public SortByDateNameFilter(String param) {
-    super(param);
+  public SortByDateNameFilter(String dateParam, String nameParam) {
+      super();
+      this.dateParam = dateParam;
+    this.nameParam = dateParam;
   }
 
   @Override

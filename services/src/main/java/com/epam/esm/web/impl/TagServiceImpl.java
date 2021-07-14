@@ -13,6 +13,7 @@ import com.epam.esm.web.TagRepository;
 import com.epam.esm.web.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
+  @Transactional
   public TagDto save(TagDto tag) {
     tagDtoValidator.validate(tag);
     List<TagDto> tags = getAll();
@@ -54,6 +56,7 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
+  @Transactional
   public List<TagDto> getAll() {
     return tagRepository.findAll().stream()
         .map(TagConverter::convertModelToDto)

@@ -26,10 +26,10 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
   @Override
   public Certificate update(Certificate certificate) {
-    entityManager.getTransaction().begin();
+    //entityManager.getTransaction().begin();
     Certificate existedCertificate = entityManager.find(Certificate.class, certificate.getId());
     if (existedCertificate == null) {
-      entityManager.getTransaction().rollback();
+     // entityManager.getTransaction().rollback();
       throw new EntityNotFoundException();
     }
     if (certificate.getName() != null) {
@@ -48,7 +48,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     if (certificate.getTags() != null) {
       existedCertificate.setTags(certificate.getTags());
     }
-    entityManager.getTransaction().commit();
+   // entityManager.getTransaction().commit();
     return existedCertificate;
   }
 
@@ -86,12 +86,12 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
   @Override
   public Certificate create(Certificate certificate) {
-    entityManager.getTransaction().begin();
+   // entityManager.getTransaction().begin();
     try {
       entityManager.persist(certificate);
-      entityManager.getTransaction().commit();
+     // entityManager.getTransaction().commit();
     } catch (Exception e) {
-      entityManager.getTransaction().rollback();
+      //entityManager.getTransaction().rollback();
       throw e;
     }
     return certificate;

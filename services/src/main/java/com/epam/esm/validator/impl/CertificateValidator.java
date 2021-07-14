@@ -22,9 +22,31 @@ public class CertificateValidator implements Validator<CertificateDto> {
   private final int MIN_DESCRIPTION_LENGTH = 10;
   private final int MAX_DESCRIPTION_LENGTH = 120;
 
+
+
   @Override
   public boolean validate(CertificateDto certificate) {
 
+    validateName(certificate);
+
+    validateDescription(certificate);
+
+    validatePrice(certificate);
+
+    validateDuration(certificate);
+
+    validateTags(certificate);
+    return true;
+  }
+
+  private void validateTags(CertificateDto certificate) {
+    if (certificate.getTags() == null) {
+      throw new ValidationException("tags must be filled", 40302);
+    }
+    certificate.getTags().forEach(tagDtoValidator::validate);
+  }
+
+  private void validateName(CertificateDto certificate){
     if (certificate.getName() == null) {
       throw new ValidationException("Name must be filled", 40302);
     }
@@ -34,7 +56,9 @@ public class CertificateValidator implements Validator<CertificateDto> {
     if (certificate.getName().length() > MAX_NAME_LENGTH) {
       throw new ValidationException("Name length must be  below 20 symbols", 40302);
     }
+  }
 
+  private void validateDescription(CertificateDto certificate) {
     if (certificate.getDescription() == null) {
       throw new ValidationException("description must be filled", 40302);
     }
@@ -44,25 +68,24 @@ public class CertificateValidator implements Validator<CertificateDto> {
     if (certificate.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
       throw new ValidationException("description length must be below 120 symbols", 40302);
     }
+  }
 
-    if (certificate.getPrice() == null) {
-      throw new ValidationException("price must be filled", 40302);
-    }
-    if (certificate.getPrice().doubleValue() < 0) {
-      throw new ValidationException("price must be more than 0 or equals 0", 40302);
-    }
-
+  private void validateDuration(CertificateDto certificate) {
     if (certificate.getDuration() == null) {
       throw new ValidationException("duration must be filled", 40302);
     }
     if (certificate.getDuration() < 0) {
       throw new ValidationException("duration must be more than 0 or equals 0", 40302);
     }
-
-    if (certificate.getTags() == null) {
-      throw new ValidationException("tags must be filled", 40302);
-    }
-    certificate.getTags().forEach(tagDtoValidator::validate);
-    return true;
   }
+
+  private void validatePrice(CertificateDto certificate) {
+    if (certificate.getPrice() == null) {
+      throw new ValidationException("price must be filled", 40302);
+    }
+    if (certificate.getPrice().doubleValue() < 0) {
+      throw new ValidationException("price must be more than 0 or equals 0", 40302);
+    }
+  }
+
 }

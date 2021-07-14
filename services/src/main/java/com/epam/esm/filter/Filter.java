@@ -18,6 +18,10 @@ public abstract class Filter {
     this.param = param;
   }
 
+  public Filter() {
+    param = "";
+  }
+
   /**
    * filter list of certificates by certain criteria
    *

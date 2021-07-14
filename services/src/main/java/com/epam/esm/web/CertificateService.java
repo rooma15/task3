@@ -50,7 +50,6 @@ public interface CertificateService extends Service<CertificateDto> {
       String description,
       String sortByName,
       String sortByDate,
-      String sortByDateName,
       int page,
       int size);
 }

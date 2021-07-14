@@ -29,9 +29,9 @@ public class TagRepositoryImpl implements TagRepository {
 
   @Override
   public List<Tag> findAll() {
-    entityManager.getTransaction().begin();
+   // entityManager.getTransaction().begin();
     List<Tag> tags = entityManager.createQuery(FIND_ALL, Tag.class).getResultList();
-    entityManager.getTransaction().commit();
+    //entityManager.getTransaction().commit();
     return tags;
   }
 
@@ -45,12 +45,12 @@ public class TagRepositoryImpl implements TagRepository {
 
   @Override
   public Tag create(Tag tag) {
-    entityManager.getTransaction().begin();
+    //entityManager.getTransaction().begin();
     try {
       entityManager.persist(tag);
-      entityManager.getTransaction().commit();
+      //entityManager.getTransaction().commit();
     } catch (Exception e) {
-      entityManager.getTransaction().rollback();
+      //entityManager.getTransaction().rollback();
       throw e;
     }
     return tag;

@@ -5,7 +5,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.web.OrderService;
 import com.epam.esm.web.UserService;
-import com.epam.esm.web.hateoas.HATHelper;
+import com.epam.esm.web.hateoas.HateoasHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -27,13 +27,13 @@ public class UserController {
 
   private final UserService userService;
   private final OrderService orderService;
-  private final HATHelper hatHelper;
+  private final HateoasHelper hateoasHelper;
 
   @Autowired
-  public UserController(UserService userService, OrderService orderService, HATHelper hatHelper) {
+  public UserController(UserService userService, OrderService orderService, HateoasHelper hateoasHelper) {
     this.userService = userService;
     this.orderService = orderService;
-    this.hatHelper = hatHelper;
+    this.hateoasHelper = hateoasHelper;
   }
 
   @RequestMapping(method = GET, produces = "application/json")
@@ -42,14 +42,14 @@ public class UserController {
       @RequestParam(required = false, defaultValue = "1") int page,
       @RequestParam(required = false, defaultValue = "5") int size) {
     List<UserDto> users = userService.getPaginated(page, size);
-    return hatHelper.makeUserLinks(users);
+    return hateoasHelper.makeUserLinks(users);
   }
 
   @RequestMapping(value = "/{id}", method = GET, produces = "application/json")
   @ResponseStatus(HttpStatus.OK)
   public UserDto getUser(@PathVariable int id) {
     UserDto user = userService.getById(id);
-    return hatHelper.makeUserLinks(user);
+    return hateoasHelper.makeUserLinks(user);
   }
 
   @RequestMapping(
@@ -60,7 +60,7 @@ public class UserController {
   @ResponseStatus(HttpStatus.OK)
   public OrderDto orderCertificate(@PathVariable int userId, @RequestBody OrderDto order) {
     OrderDto newOrder = orderService.orderCertificate(userId, order.getCertificate().getId());
-    return hatHelper.makeOrderLinks(newOrder, userId);
+    return hateoasHelper.makeOrderLinks(newOrder, userId);
   }
 
   @RequestMapping(value = "/{userId}/orders", method = GET, produces = "application/json")
@@ -70,18 +70,18 @@ public class UserController {
       @RequestParam(required = false, defaultValue = "5") Integer size) {
     List<OrderDto> orders =
         orderService.getPaginated(orderService.getUserOrders(userId), page, size);
-    return hatHelper.makeOrderLinks(orders, userId);
+    return hateoasHelper.makeOrderLinks(orders, userId);
   }
 
   @RequestMapping(value = "/{userId}/orders/{orderId}", method = GET, produces = "application/json")
   public OrderDto getUserOrder(@PathVariable int userId, @PathVariable int orderId) {
     OrderDto order = orderService.getUserOrder(userId, orderId);
-    return hatHelper.makeOrderLinks(order, userId);
+    return hateoasHelper.makeOrderLinks(order, userId);
   }
 
   @RequestMapping(value = "/most", method = GET)
   public TagDto getWidelyUsedTag() {
     TagDto mostWidelyUsedTag = userService.getMostWidelyUsedTagOfRichestUser();
-    return hatHelper.makeTagLinks(mostWidelyUsedTag);
+    return hateoasHelper.makeTagLinks(mostWidelyUsedTag);
   }
 }

@@ -2,7 +2,7 @@ package com.epam.esm.web.contoller;
 
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.web.CertificateService;
-import com.epam.esm.web.hateoas.HATHelper;
+import com.epam.esm.web.hateoas.HateoasHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -26,16 +26,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 public class CertificateController {
 
   private final CertificateService certificateService;
-  private final HATHelper hatHelper;
+  private final HateoasHelper hateoasHelper;
   /**
    * Instantiates a new Certificate controller.
    *
    * @param certificateService the certificate service
    */
   @Autowired
-  public CertificateController(CertificateService certificateService, HATHelper hatHelper) {
+  public CertificateController(CertificateService certificateService, HateoasHelper hateoasHelper) {
     this.certificateService = certificateService;
-    this.hatHelper = hatHelper;
+    this.hateoasHelper = hateoasHelper;
   }
 
   /**
@@ -56,13 +56,12 @@ public class CertificateController {
       @RequestParam(required = false) String description,
       @RequestParam(required = false) String sortByDate,
       @RequestParam(required = false) String sortByName,
-      @RequestParam(required = false) String sortByDateName,
       @RequestParam(required = false, defaultValue = "1") Integer page,
       @RequestParam(required = false, defaultValue = "5") Integer size) {
     List<CertificateDto> certificates =
         certificateService.getSortedCertificates(
-            tagName, name, description, sortByDate, sortByName, sortByDateName, page, size);
-    return hatHelper.makeCertificateLinks(certificates);
+            tagName, name, description, sortByDate, sortByName, page, size);
+    return hateoasHelper.makeCertificateLinks(certificates);
   }
 
   /**
@@ -75,7 +74,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto getCertificate(@PathVariable int id) {
     CertificateDto certificate = certificateService.getById(id);
-    return hatHelper.makeCertificateLinks(certificate);
+    return hateoasHelper.makeCertificateLinks(certificate);
   }
 
   /**
@@ -93,7 +92,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto update(@PathVariable int id, @RequestBody CertificateDto certificate) {
     CertificateDto updatedCertificate = certificateService.fullUpdate(certificate, id);
-    return hatHelper.makeCertificateLinks(updatedCertificate);
+    return hateoasHelper.makeCertificateLinks(updatedCertificate);
   }
 
   /**
@@ -111,7 +110,7 @@ public class CertificateController {
   @ResponseStatus(HttpStatus.OK)
   public CertificateDto updatePart(@PathVariable int id, @RequestBody CertificateDto certificate) {
     CertificateDto updatedCertificate = certificateService.partialUpdate(certificate, id);
-    return hatHelper.makeCertificateLinks(updatedCertificate);
+    return hateoasHelper.makeCertificateLinks(updatedCertificate);
   }
 
   /**
@@ -124,7 +123,7 @@ public class CertificateController {
   @RequestMapping(method = POST, consumes = "application/json", produces = "application/json")
   public CertificateDto create(@RequestBody CertificateDto certificate) {
     CertificateDto newCertificate = certificateService.save(certificate);
-    return hatHelper.makeCertificateLinks(newCertificate);
+    return hateoasHelper.makeCertificateLinks(newCertificate);
   }
 
   /**

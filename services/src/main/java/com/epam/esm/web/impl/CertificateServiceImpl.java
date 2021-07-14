@@ -21,6 +21,7 @@ import com.epam.esm.web.CertificateService;
 import com.epam.esm.web.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -82,7 +83,6 @@ public class CertificateServiceImpl implements CertificateService {
       String description,
       String sortByDate,
       String sortByName,
-      String sortByDateName,
       int page,
       int size) {
     FilterManager filterManager = new FilterManager();
@@ -103,8 +103,8 @@ public class CertificateServiceImpl implements CertificateService {
     if (sortByName != null) {
       filterManager.add(new SortByNameFilter(sortByName));
     }
-    if (sortByDateName != null) {
-      filterManager.add(new SortByDateNameFilter(sortByDateName));
+    if (sortByDate != null && sortByName != null) {
+      filterManager.add(new SortByDateNameFilter(sortByDate, sortByName));
     }
 
     if (filterManager.getSize() != 0) {
@@ -128,6 +128,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public CertificateDto fullUpdate(CertificateDto certificate, int id) {
     validator.validate(certificate);
     return update(certificate, id);
@@ -181,6 +182,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public CertificateDto save(CertificateDto certificate) {
     validator.validate(certificate);
     certificate.setCreateDate(LocalDateTime.now());

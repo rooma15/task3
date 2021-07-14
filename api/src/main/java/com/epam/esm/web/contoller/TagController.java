@@ -2,7 +2,7 @@ package com.epam.esm.web.contoller;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.web.TagService;
-import com.epam.esm.web.hateoas.HATHelper;
+import com.epam.esm.web.hateoas.HateoasHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -22,16 +22,16 @@ import java.util.List;
 public class TagController {
 
   private final TagService tagService;
-  private final HATHelper hatHelper;
+  private final HateoasHelper hateoasHelper;
   /**
    * Instantiates a new Tag controller.
    *
    * @param tagService the tag service
    */
   @Autowired
-  public TagController(TagService tagService, HATHelper hatHelper) {
+  public TagController(TagService tagService, HateoasHelper hateoasHelper) {
     this.tagService = tagService;
-    this.hatHelper = hatHelper;
+    this.hateoasHelper = hateoasHelper;
   }
 
   /**
@@ -44,7 +44,7 @@ public class TagController {
       @RequestParam(required = false, defaultValue = "1") int page,
       @RequestParam(required = false, defaultValue = "5") int size) {
     List<TagDto> tags = tagService.getPaginated(page, size);
-    return hatHelper.makeTagLinks(new HashSet<>(tags));
+    return hateoasHelper.makeTagLinks(new HashSet<>(tags));
   }
 
   /**
@@ -56,7 +56,7 @@ public class TagController {
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
   public TagDto getTag(@PathVariable int id) {
     TagDto tag = tagService.getById(id);
-    return hatHelper.makeTagLinks(tag);
+    return hateoasHelper.makeTagLinks(tag);
   }
 
   /**
@@ -71,7 +71,8 @@ public class TagController {
       consumes = "application/json")
   public TagDto createTag(@RequestBody TagDto tag) {
     TagDto newTag = tagService.save(tag);
-    return hatHelper.makeTagLinks(newTag);
+    //return newTag;
+    return hateoasHelper.makeTagLinks(newTag);
   }
 
   /**

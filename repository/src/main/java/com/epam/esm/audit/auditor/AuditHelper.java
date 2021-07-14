@@ -8,10 +8,11 @@ import javax.persistence.Persistence;
 
 public class AuditHelper {
 
+    private final String PERSISTENCE_UNIT_NAME = "my-pers";
+
     private final EntityManager entityManager;
 
     public AuditHelper() {
-        String PERSISTENCE_UNIT_NAME = "my-pers";
         EntityManagerFactory emFactoryObj = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         entityManager = emFactoryObj.createEntityManager();
     }
