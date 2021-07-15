@@ -12,6 +12,7 @@
     <class>com.epam.esm.audit.model.CertificateAudit</class>
     <class>com.epam.esm.audit.model.OrderAudit</class>
     <class>com.epam.esm.audit.model.TagAudit</class>
+    <class>com.epam.esm.audit.model.UserAudit</class>
     <properties>
         <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
         <property name="hibernate.hbm2ddl.auto" value="none"/>

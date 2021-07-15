@@ -10,4 +10,6 @@ public class DuplicateResourceException extends ApplicationException {
   public DuplicateResourceException(String message, int errorCode) {
     super(message, errorCode);
   }
+
+
 }

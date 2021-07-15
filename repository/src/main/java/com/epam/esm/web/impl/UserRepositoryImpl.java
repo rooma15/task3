@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
+  @PersistenceContext
   private final EntityManager entityManager;
 
   private final String FIND_ALL = "SELECT a FROM User a";
@@ -23,18 +25,12 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public List<User> findAll() {
-    entityManager.getTransaction().begin();
-    List<User> users = entityManager.createQuery(FIND_ALL, User.class).getResultList();
-    entityManager.getTransaction().commit();
-    return users;
+    return entityManager.createQuery(FIND_ALL, User.class).getResultList();
   }
 
   @Override
   public User findOne(int id) {
-    entityManager.getTransaction().begin();
-    User user = entityManager.find(User.class, id);
-    entityManager.getTransaction().commit();
-    return user;
+    return entityManager.find(User.class, id);
   }
 
   @Override

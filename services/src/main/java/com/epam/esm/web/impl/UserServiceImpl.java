@@ -5,6 +5,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.PaginationException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.localization.LocaleTranslator;
 import com.epam.esm.model.User;
 import com.epam.esm.validator.PageValidator;
 import com.epam.esm.web.CertificateService;
@@ -13,6 +14,7 @@ import com.epam.esm.web.UserRepository;
 import com.epam.esm.web.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,8 @@ public class UserServiceImpl implements UserService {
   private final String WIDELY_USED_TAG =
           """
                   select count(tag.id) as kol, tag.id from tag 
-                  join certificateTags on tag.id=certificateTags.tag_id
-                  join orders on certificateTags.certificate_id=orders.certificate_id
+                  join certificate_tags on tag.id=certificate_tags.tag_id
+                  join orders on certificate_tags.certificate_id=orders.certificate_id
                   join (select max(orders.cost) as summary, user.id as id from user 
                   join orders on user.id=orders.user_id group by user.id
                   order by summary desc
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public List<UserDto> getAll() {
     return userRepository.findAll().stream()
         .map(UserConverter::convertModelToDto)
@@ -58,16 +61,21 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public UserDto getById(int id) {
     User user = userRepository.findOne(id);
     if (user == null) {
-      throw new ResourceNotFoundException("user with id = " + id + " does not exist", 40404);
+      String formattedException =
+              String.format(
+                      LocaleTranslator.translate("user.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40404);
     }
     return UserConverter.convertModelToDto(user);
   }
 
 
   @Override
+  @Transactional
   public TagDto getMostWidelyUsedTagOfRichestUser() {
     List<Object> params = new ArrayList<>();
     int tagId = userRepository.findMostUsedTag(WIDELY_USED_TAG, params);
@@ -76,6 +84,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public List<UserDto> getPaginated(Integer page, Integer size) {
     pageValidator.validate(page, size);
     int from = (page - 1) * size;
@@ -84,7 +93,7 @@ public class UserServiceImpl implements UserService {
                     .map(UserConverter::convertModelToDto)
                     .collect(Collectors.toList());
     if (users.isEmpty()) {
-      throw new PaginationException("this page does not exist", 404);
+      throw new PaginationException("page.doesNotExist", 404);
     }
     return users;
   }

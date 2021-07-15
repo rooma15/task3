@@ -12,6 +12,7 @@ import com.epam.esm.filter.SortByDateFilter;
 import com.epam.esm.filter.SortByDateNameFilter;
 import com.epam.esm.filter.SortByNameFilter;
 import com.epam.esm.filter.TagNameFilter;
+import com.epam.esm.localization.LocaleTranslator;
 import com.epam.esm.model.Certificate;
 import com.epam.esm.validator.PageValidator;
 import com.epam.esm.validator.PartialValidator;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -77,6 +79,7 @@ public class CertificateServiceImpl implements CertificateService {
       };
 
   @Override
+  @Transactional
   public List<CertificateDto> getSortedCertificates(
       String tagName,
       String name,
@@ -115,12 +118,15 @@ public class CertificateServiceImpl implements CertificateService {
     return getPaginated(page, size);
   }
 
-  private CertificateDto update(CertificateDto certificate, int id) {
+  @Transactional
+  CertificateDto update(CertificateDto certificate, int id) {
     certificate.setId(id);
     certificate.setLastUpdateDate(LocalDateTime.now());
     Certificate updatedCertificate;
     if (!isResourceExist(id)) {
-      throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+      String formattedException =
+              String.format(LocaleTranslator.translate("certificate.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40402);
     } else {
       updatedCertificate = saveOrUpdate(certificate, updateOperator);
     }
@@ -135,6 +141,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public CertificateDto partialUpdate(CertificateDto certificate, int id) {
     partialValidator.validate(certificate);
     return update(certificate, id);
@@ -149,8 +156,9 @@ public class CertificateServiceImpl implements CertificateService {
     return false;
   }
 
-  private Certificate saveOrUpdate(
-      CertificateDto certificate, UnaryOperator<Certificate> operator) {
+  @Transactional
+  Certificate saveOrUpdate(
+          CertificateDto certificate, UnaryOperator<Certificate> operator) {
     List<TagDto> allTags = tagService.getAll();
     Set<TagDto> existedTags = new HashSet<>();
     if (certificate.getTags() != null) {
@@ -192,6 +200,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public List<CertificateDto> getAll() {
     return certificateRepository.findAll().stream()
         .map(CertificateConverter::convertModelToDto)
@@ -199,18 +208,24 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public CertificateDto getById(int id) {
     Certificate certificate = certificateRepository.findOne(id);
     if (certificate == null) {
-      throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+      String formattedException =
+              String.format(LocaleTranslator.translate("certificate.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40402);
     }
     return CertificateConverter.convertModelToDto(certificateRepository.findOne(id));
   }
 
   @Override
+  @Transactional
   public int delete(int id) {
     if (!isResourceExist(id)) {
-      throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+      String formattedException =
+          String.format(LocaleTranslator.translate("certificate.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40402);
     } else {
       certificateRepository.delete(id);
     }
@@ -218,6 +233,7 @@ public class CertificateServiceImpl implements CertificateService {
   }
 
   @Override
+  @Transactional
   public List<CertificateDto> getPaginated(Integer page, Integer size) {
     pageValidator.validate(page, size);
     int from = (page - 1) * size;
@@ -226,7 +242,7 @@ public class CertificateServiceImpl implements CertificateService {
             .map(CertificateConverter::convertModelToDto)
             .collect(Collectors.toList());
     if (certificates.isEmpty()) {
-      throw new PaginationException("this page does not exist", 404);
+      throw new PaginationException(LocaleTranslator.translate("page.doesNotExist"), 404);
     }
     return certificates;
   }

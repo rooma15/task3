@@ -12,4 +12,5 @@ public class ResourceIsUsedException extends ApplicationException {
   public ResourceIsUsedException(String message, int errorCode) {
     super(message, errorCode);
   }
+
 }

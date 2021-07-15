@@ -10,4 +10,5 @@ public class ResourceNotFoundException extends ApplicationException {
   public ResourceNotFoundException(String message, int errorCode) {
     super(message, errorCode);
   }
+
 }

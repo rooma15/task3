@@ -71,7 +71,6 @@ public class TagController {
       consumes = "application/json")
   public TagDto createTag(@RequestBody TagDto tag) {
     TagDto newTag = tagService.save(tag);
-    //return newTag;
     return hateoasHelper.makeTagLinks(newTag);
   }
 

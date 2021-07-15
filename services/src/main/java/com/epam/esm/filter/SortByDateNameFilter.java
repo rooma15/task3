@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SortByDateNameFilter extends Filter {
-    private final String dateParam;
-    private final String nameParam;
+  private String dateParam;
+  private String nameParam;
   private final Comparator<CertificateDto> comparator =
       (cert1, cert2) -> {
         LocalDateTime date1 = cert1.getCreateDate();
@@ -17,26 +17,20 @@ public class SortByDateNameFilter extends Filter {
         int compareResult = date1.compareTo(date2);
         if (compareResult == 0) {
           int compareNameResult = cert1.getName().compareTo(cert2.getName());
-          return param.equalsIgnoreCase("desc")
-                  ? -compareNameResult
-                  : compareNameResult;
+          return nameParam.equalsIgnoreCase("desc") ? -compareNameResult : compareNameResult;
         } else {
-          return param.equalsIgnoreCase("desc")
-                  ? -compareResult
-                  : compareResult;
+          return dateParam.equalsIgnoreCase("desc") ? -compareResult : compareResult;
         }
       };
 
   public SortByDateNameFilter(String dateParam, String nameParam) {
-      super();
-      this.dateParam = dateParam;
-    this.nameParam = dateParam;
+    super();
+    this.dateParam = dateParam;
+    this.nameParam = nameParam;
   }
 
   @Override
   List<CertificateDto> filter(List<CertificateDto> soughtList) {
-    return soughtList.stream()
-            .sorted(comparator)
-            .collect(Collectors.toList());
+    return soughtList.stream().sorted(comparator).collect(Collectors.toList());
   }
 }

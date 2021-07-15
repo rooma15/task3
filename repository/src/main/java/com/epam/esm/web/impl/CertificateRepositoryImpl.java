@@ -4,18 +4,20 @@ import com.epam.esm.model.Certificate;
 import com.epam.esm.web.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
 
-  private final EntityManager entityManager;
+  @PersistenceContext private final EntityManager entityManager;
 
   private final String MAKE_LINK =
-      "insert into `gift-certificates`.certificateTags (id, certificate_id, tag_id) values (null, ?, ?)";
+      "insert into `gift-certificates`.certificate_tags (id, certificate_id, tag_id) values (null, ?, ?)";
 
   private final String FIND_ALL = "SELECT a FROM Certificate a";
 
@@ -26,10 +28,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
   @Override
   public Certificate update(Certificate certificate) {
-    //entityManager.getTransaction().begin();
     Certificate existedCertificate = entityManager.find(Certificate.class, certificate.getId());
     if (existedCertificate == null) {
-     // entityManager.getTransaction().rollback();
       throw new EntityNotFoundException();
     }
     if (certificate.getName() != null) {
@@ -48,7 +48,6 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     if (certificate.getTags() != null) {
       existedCertificate.setTags(certificate.getTags());
     }
-   // entityManager.getTransaction().commit();
     return existedCertificate;
   }
 
@@ -57,56 +56,34 @@ public class CertificateRepositoryImpl implements CertificateRepository {
   }
 
   @Override
+  @Transactional
   public void makeLink(int certificateId, int tagId) {
-    entityManager.getTransaction().begin();
     entityManager
         .createNativeQuery(MAKE_LINK)
         .setParameter(1, certificateId)
         .setParameter(2, tagId)
         .executeUpdate();
-    entityManager.getTransaction().commit();
   }
 
   @Override
   public List<Certificate> findAll() {
-    entityManager.getTransaction().begin();
-    List<Certificate> certificates =
-        entityManager.createQuery(FIND_ALL, Certificate.class).getResultList();
-    entityManager.getTransaction().commit();
-    return certificates;
+    return entityManager.createQuery(FIND_ALL, Certificate.class).getResultList();
   }
 
   @Override
   public Certificate findOne(int id) {
-    entityManager.getTransaction().begin();
-    Certificate cert = entityManager.find(Certificate.class, id);
-    entityManager.getTransaction().commit();
-    return cert;
+    return entityManager.find(Certificate.class, id);
   }
 
   @Override
   public Certificate create(Certificate certificate) {
-   // entityManager.getTransaction().begin();
-    try {
-      entityManager.persist(certificate);
-     // entityManager.getTransaction().commit();
-    } catch (Exception e) {
-      //entityManager.getTransaction().rollback();
-      throw e;
-    }
+    entityManager.persist(certificate);
     return certificate;
   }
 
   @Override
   public void delete(int id) {
-    entityManager.getTransaction().begin();
-    try {
-      entityManager.remove(entityManager.getReference(Certificate.class, id));
-      entityManager.getTransaction().commit();
-    } catch (Exception e) {
-      entityManager.getTransaction().rollback();
-      throw e;
-    }
+    entityManager.remove(entityManager.getReference(Certificate.class, id));
   }
 
   @Override

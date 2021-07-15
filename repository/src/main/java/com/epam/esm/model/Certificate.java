@@ -42,7 +42,7 @@ public class Certificate {
 
   @ManyToMany(cascade = {CascadeType.PERSIST})
   @JoinTable(
-      name = "certificateTags",
+      name = "certificate_tags",
       joinColumns = {@JoinColumn(name = "certificate_id")},
       inverseJoinColumns = {@JoinColumn(name = "tag_id")})
   private Set<Tag> tags = new HashSet<>();
@@ -64,7 +64,7 @@ public class Certificate {
     audit("REMOVE");
   }
 
-  private void audit(String operationType) {
+  void audit(String operationType) {
     AuditHelper auditHelper = new AuditHelper();
     CertificateAudit certificateAudit = new CertificateAudit();
     certificateAudit.setCertificateId(id);

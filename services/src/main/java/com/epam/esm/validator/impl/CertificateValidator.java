@@ -3,8 +3,10 @@ package com.epam.esm.validator.impl;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.exception.ValidationException;
+import com.epam.esm.localization.LocaleTranslator;
 import com.epam.esm.validator.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
 @Component("certificateValidator")
@@ -22,7 +24,7 @@ public class CertificateValidator implements Validator<CertificateDto> {
   private final int MIN_DESCRIPTION_LENGTH = 10;
   private final int MAX_DESCRIPTION_LENGTH = 120;
 
-
+  private String translatedException = "";
 
   @Override
   public boolean validate(CertificateDto certificate) {
@@ -41,51 +43,71 @@ public class CertificateValidator implements Validator<CertificateDto> {
 
   private void validateTags(CertificateDto certificate) {
     if (certificate.getTags() == null) {
-      throw new ValidationException("tags must be filled", 40302);
+      translatedException = LocaleTranslator.translate("tag.mustBeFilled");
+      throw new ValidationException(translatedException, 40302);
     }
     certificate.getTags().forEach(tagDtoValidator::validate);
   }
 
-  private void validateName(CertificateDto certificate){
+  private void validateName(CertificateDto certificate) {
     if (certificate.getName() == null) {
-      throw new ValidationException("Name must be filled", 40302);
+      translatedException = LocaleTranslator.translate("certificate.nameMustBeFilled");
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getName().length() < MIN_NAME_LENGTH) {
-      throw new ValidationException("Name length must be more than 3 symbols", 40302);
+      translatedException =
+          String.format(
+              LocaleTranslator.translate("certificate.nameLengthLowerBorder"), MIN_NAME_LENGTH);
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getName().length() > MAX_NAME_LENGTH) {
-      throw new ValidationException("Name length must be  below 20 symbols", 40302);
+      translatedException =
+          String.format(
+              LocaleTranslator.translate("certificate.nameLengthUpperBorder"), MAX_NAME_LENGTH);
+      throw new ValidationException(translatedException, 40302);
     }
   }
 
   private void validateDescription(CertificateDto certificate) {
     if (certificate.getDescription() == null) {
-      throw new ValidationException("description must be filled", 40302);
+      translatedException = LocaleTranslator.translate("certificate.descriptionMustBeFilled");
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getDescription().length() < MIN_DESCRIPTION_LENGTH) {
-      throw new ValidationException("description length must be more than 10 symbols", 40302);
+      translatedException =
+          String.format(
+              LocaleTranslator.translate("certificate.descriptionLengthLowerBorder"),
+              MIN_DESCRIPTION_LENGTH);
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-      throw new ValidationException("description length must be below 120 symbols", 40302);
+      translatedException =
+          String.format(
+              LocaleTranslator.translate("certificate.descriptionLengthUpperBorder"),
+              MAX_DESCRIPTION_LENGTH);
+      throw new ValidationException(translatedException, 40302);
     }
   }
 
   private void validateDuration(CertificateDto certificate) {
     if (certificate.getDuration() == null) {
-      throw new ValidationException("duration must be filled", 40302);
+      translatedException = LocaleTranslator.translate("certificate.durationMustBeFilled");
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getDuration() < 0) {
-      throw new ValidationException("duration must be more than 0 or equals 0", 40302);
+      translatedException = String.format(LocaleTranslator.translate("certificate.durationGreaterThan"), 0);
+      throw new ValidationException(translatedException, 40302);
     }
   }
 
   private void validatePrice(CertificateDto certificate) {
     if (certificate.getPrice() == null) {
-      throw new ValidationException("price must be filled", 40302);
+      translatedException = LocaleTranslator.translate("certificate.priceMustBeFilled");
+      throw new ValidationException(translatedException, 40302);
     }
     if (certificate.getPrice().doubleValue() < 0) {
-      throw new ValidationException("price must be more than 0 or equals 0", 40302);
+      translatedException = String.format(LocaleTranslator.translate("certificate.priceGreaterThan"), 0);
+      throw new ValidationException(translatedException, 40302);
     }
   }
-
 }

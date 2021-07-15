@@ -11,4 +11,5 @@ public class ValidationException extends ApplicationException {
   public ValidationException(String message, int errorCode) {
     super(message, errorCode);
   }
+
 }

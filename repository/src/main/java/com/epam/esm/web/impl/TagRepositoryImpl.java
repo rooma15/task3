@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @Repository
 public class TagRepositoryImpl implements TagRepository {
 
-  private final EntityManager entityManager;
+  @PersistenceContext private final EntityManager entityManager;
 
   private final String FIND_ALL = "SELECT a FROM Tag a";
 
@@ -29,43 +30,23 @@ public class TagRepositoryImpl implements TagRepository {
 
   @Override
   public List<Tag> findAll() {
-   // entityManager.getTransaction().begin();
-    List<Tag> tags = entityManager.createQuery(FIND_ALL, Tag.class).getResultList();
-    //entityManager.getTransaction().commit();
-    return tags;
+    return entityManager.createQuery(FIND_ALL, Tag.class).getResultList();
   }
 
   @Override
   public Tag findOne(int id) {
-    entityManager.getTransaction().begin();
-    Tag tag = entityManager.find(Tag.class, id);
-    entityManager.getTransaction().commit();
-    return tag;
+    return entityManager.find(Tag.class, id);
   }
 
   @Override
   public Tag create(Tag tag) {
-    //entityManager.getTransaction().begin();
-    try {
-      entityManager.persist(tag);
-      //entityManager.getTransaction().commit();
-    } catch (Exception e) {
-      //entityManager.getTransaction().rollback();
-      throw e;
-    }
+    entityManager.persist(tag);
     return tag;
   }
 
   @Override
   public void delete(int id) {
-    entityManager.getTransaction().begin();
-    try {
-      entityManager.remove(entityManager.getReference(Tag.class, id));
-      entityManager.getTransaction().commit();
-    } catch (Exception e) {
-      entityManager.getTransaction().rollback();
-      throw e;
-    }
+    entityManager.remove(entityManager.getReference(Tag.class, id));
   }
 
   @Override

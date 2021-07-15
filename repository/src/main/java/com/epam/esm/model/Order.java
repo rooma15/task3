@@ -3,6 +3,7 @@ package com.epam.esm.model;
 import com.epam.esm.audit.auditor.AuditHelper;
 import com.epam.esm.audit.model.OrderAudit;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class Order {
 
   private BigDecimal cost;
 
-  @OneToOne
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
   @JoinColumn(name = "certificate_id")
   private Certificate certificate;
 

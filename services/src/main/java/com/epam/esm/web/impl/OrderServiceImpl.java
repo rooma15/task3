@@ -7,6 +7,7 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.DuplicateResourceException;
 import com.epam.esm.exception.PaginationException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.localization.LocaleTranslator;
 import com.epam.esm.model.Order;
 import com.epam.esm.validator.PageValidator;
 import com.epam.esm.web.CertificateService;
@@ -15,9 +16,11 @@ import com.epam.esm.web.OrderService;
 import com.epam.esm.web.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public List<OrderDto> getAll() {
     return orderRepository.findAll().stream()
         .map(OrderConverter::convertModelToDto)
@@ -49,15 +53,19 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public OrderDto getById(int id) {
     Order order = orderRepository.findOne(id);
     if (order == null) {
-      throw new ResourceNotFoundException("order with id = " + id + " does not exist", 40403);
+      String formattedException =
+          String.format(LocaleTranslator.translate("order.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40403);
     }
     return OrderConverter.convertModelToDto(orderRepository.findOne(id));
   }
 
   @Override
+  @Transactional
   public List<OrderDto> getPaginated(Integer page, Integer size) {
     pageValidator.validate(page, size);
     int from = (page - 1) * size;
@@ -66,12 +74,13 @@ public class OrderServiceImpl implements OrderService {
             .map(OrderConverter::convertModelToDto)
             .collect(Collectors.toList());
     if (orders.isEmpty()) {
-      throw new PaginationException("this page does not exist", 404);
+      throw new PaginationException(LocaleTranslator.translate("page.doesNotExist"), 404);
     }
     return orders;
   }
 
   @Override
+  @Transactional
   public OrderDto orderCertificate(int userId, int certificateId) {
     UserDto user = userService.getById(userId);
     CertificateDto certificate = certificateService.getById(certificateId);
@@ -79,12 +88,10 @@ public class OrderServiceImpl implements OrderService {
     List<OrderDto> userOrders = user.getOrders();
     for (OrderDto userOrder : userOrders) {
       if (userOrder.getCertificate().getId() == certificateId) {
-        throw new DuplicateResourceException(
-            "user with id = "
-                + userId
-                + " has already ordered certificate with id  = "
-                + certificateId,
-            40903);
+        String formattedException =
+            String.format(
+                LocaleTranslator.translate("order.duplicatedOrder"), userId, certificateId);
+        throw new DuplicateResourceException(formattedException, 40903);
       }
     }
     return OrderConverter.convertModelToDto(
@@ -92,12 +99,14 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public List<OrderDto> getUserOrders(int userId) {
     UserDto user = userService.getById(userId);
     return user.getOrders();
   }
 
   @Override
+  @Transactional
   public OrderDto getUserOrder(int userId, int orderId) {
     UserDto user = userService.getById(userId);
     Optional<OrderDto> optionalOrder =
@@ -105,8 +114,9 @@ public class OrderServiceImpl implements OrderService {
     if (optionalOrder.isPresent()) {
       return optionalOrder.get();
     } else {
-      throw new ResourceNotFoundException(
-          "user with id = " + userId + " does not have order with id = " + orderId, 40403);
+      String formattedException =
+          String.format(LocaleTranslator.translate("order.userNotOrdered"), userId, orderId);
+      throw new ResourceNotFoundException(formattedException, 40403);
     }
   }
 }

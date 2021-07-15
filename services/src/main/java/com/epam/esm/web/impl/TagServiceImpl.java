@@ -6,6 +6,7 @@ import com.epam.esm.exception.DuplicateResourceException;
 import com.epam.esm.exception.PaginationException;
 import com.epam.esm.exception.ResourceIsUsedException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.localization.LocaleTranslator;
 import com.epam.esm.model.Tag;
 import com.epam.esm.validator.PageValidator;
 import com.epam.esm.validator.Validator;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,8 +48,10 @@ public class TagServiceImpl implements TagService {
     List<TagDto> tags = getAll();
     for (TagDto tagDto : tags) {
       if (tagDto.getName().equals(tag.getName())) {
-        throw new DuplicateResourceException(
-            "tag with name = " + tag.getName() + " already exists", 40901);
+        String formattedException =
+            String.format(
+                LocaleTranslator.translate("tag.alreadyExists"), tag.getName());
+        throw new DuplicateResourceException(formattedException, 40901);
       }
     }
     Tag newTag = tagRepository.create(TagConverter.convertDtoToModel(tag));
@@ -64,25 +68,36 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
+  @Transactional
   public TagDto getById(int id) {
     Tag tag = tagRepository.findOne(id);
     if (tag == null) {
-      throw new ResourceNotFoundException("tag with id = " + id + " does not exist", 40401);
+      String formattedException =
+              String.format(
+                      LocaleTranslator.translate("tag.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40401);
     }
     return TagConverter.convertModelToDto(tag);
   }
 
   @Override
+  @Transactional
   public int delete(int id) {
     if (!isResourceExist(id)) {
-      throw new ResourceNotFoundException("certificate with id = " + id + " does not exist", 40402);
+      String formattedException =
+              String.format(
+                      LocaleTranslator.translate("tag.doesNotExist"), id);
+      throw new ResourceNotFoundException(formattedException, 40401);
     } else {
       List<Object> params = new ArrayList<>();
       params.add(id);
       BigInteger tagCounter =
           (BigInteger) tagRepository.doNativeGetQuery(CHECK_TAG_EXISTENCE, params);
       if (tagCounter.intValue() > 0) {
-        throw new ResourceIsUsedException("tag with id = " + id + " is in use", 40901);
+        String formattedException =
+                String.format(
+                        LocaleTranslator.translate("tag.inUse"), id);
+        throw new ResourceIsUsedException(formattedException, 40901);
       } else {
         tagRepository.delete(id);
       }
@@ -91,6 +106,7 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
+  @Transactional
   public List<TagDto> getPaginated(Integer page, Integer size) {
     pageValidator.validate(page, size);
     int from = (page - 1) * size;
@@ -99,7 +115,7 @@ public class TagServiceImpl implements TagService {
             .map(TagConverter::convertModelToDto)
             .collect(Collectors.toList());
     if (tags.isEmpty()) {
-      throw new PaginationException("this page does not exist", 404);
+      throw new PaginationException(LocaleTranslator.translate("page.doesNotExist"), 404);
     }
     return tags;
   }

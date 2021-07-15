@@ -1,18 +1,23 @@
 package com.epam.esm.validator.impl;
 
 import com.epam.esm.exception.PaginationException;
+import com.epam.esm.localization.LocaleTranslator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PageValidator implements com.epam.esm.validator.PageValidator {
 
+  private String translatedException = "";
+
   @Override
   public void validate(Integer page, Integer size) {
     if (page < 1) {
-      throw new PaginationException("page number must be greater or equals 1", 403);
+      translatedException = String.format(LocaleTranslator.translate("page.greaterThan"), 1);
+      throw new PaginationException(translatedException, 403);
     }
     if (size < 0) {
-      throw new PaginationException("size must be more or equals 0 ", 403);
+      translatedException = String.format(LocaleTranslator.translate("pageSize.greaterThan"), 0);
+      throw new PaginationException(translatedException, 403);
     }
   }
 }

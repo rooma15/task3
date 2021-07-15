@@ -6,12 +6,13 @@ import com.epam.esm.web.OrderRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
 
-  private final EntityManager entityManager;
+  @PersistenceContext private final EntityManager entityManager;
 
   private final String FIND_ALL = "SELECT a FROM Order a";
 
@@ -21,30 +22,17 @@ public class OrderRepositoryImpl implements OrderRepository {
 
   @Override
   public List<Order> findAll() {
-    entityManager.getTransaction().begin();
-    List<Order> orders = entityManager.createQuery(FIND_ALL, Order.class).getResultList();
-    entityManager.getTransaction().commit();
-    return orders;
+    return entityManager.createQuery(FIND_ALL, Order.class).getResultList();
   }
 
   @Override
   public Order findOne(int id) {
-    entityManager.getTransaction().begin();
-    Order order = entityManager.find(Order.class, id);
-    entityManager.getTransaction().commit();
-    return order;
+    return entityManager.find(Order.class, id);
   }
 
   @Override
   public Order create(Order order) {
-    entityManager.getTransaction().begin();
-    try {
-      entityManager.persist(order);
-      entityManager.getTransaction().commit();
-    } catch (Exception e) {
-      entityManager.getTransaction().rollback();
-      throw e;
-    }
+    entityManager.persist(order);
     return order;
   }
 
@@ -61,18 +49,11 @@ public class OrderRepositoryImpl implements OrderRepository {
 
   @Override
   public Order order(Integer userId, Order order) {
-    entityManager.getTransaction().begin();
     User existedUser = entityManager.find(User.class, userId);
     List<Order> orders = existedUser.getOrders();
     orders.add(order);
-    try {
-      existedUser.setOrders(orders);
-      entityManager.getTransaction().commit();
-      entityManager.refresh(existedUser);
-    } catch (Exception e) {
-      entityManager.getTransaction().rollback();
-      throw e;
-    }
+    existedUser.setOrders(orders);
+    entityManager.refresh(existedUser);
     return order;
   }
 }
